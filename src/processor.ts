@@ -1,4 +1,4 @@
-import model from "./llm";
+import {  ollamaFunction, ollama } from "./llm";
 import * as fs from "fs";
 import * as path from "path";
 import jsonTranslator from "./translators/json";
@@ -7,17 +7,11 @@ import textTranslator from "./translators/text";
 
 export const processFile = async (filePath: string, destinationFilePath: string, destlang: string) => {
 	const fileContent = fs.readFileSync(filePath, "utf-8");
-	
+	let result = "";
 	// if file extension is JSON then run jsonTranslator
 	if (filePath.endsWith(".json")) {
-		const result = await jsonTranslator(model, fileContent, destlang);
-		
-		// create file if it does not exist
-		if (!fs.existsSync(destinationFilePath)) {
-			fs.writeFileSync(destinationFilePath, "");
-		}
-		// write the result to the destination file
-		fs.writeFileSync(destinationFilePath, JSON.stringify(result));
+		const translatedContent = await jsonTranslator(ollamaFunction, fileContent, destlang);
+		result =  JSON.stringify(result);
 	} else if (filePath.endsWith(".txt")) {
 		// if file extension is txt then run textTranslator
 		throw new Error("Text translation is not supported yet");
@@ -30,19 +24,36 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 	} else if (filePath.endsWith(".docx")) {
 		// if file extension is docx then run docxTranslator
 	} else if (filePath.endsWith(".md") || filePath.endsWith(".mdx")) {
+		const documents: string[] = [];
+		let content = fileContent;
+		if (filePath.endsWith(".mdx")) {
+			// split the header and content
+			let headerContentSection = fileContent.split("---");
+			const header = headerContentSection[1];
+			console.log({ header: `---${header}---` });
+			documents.push(`---${header}---`);
+			content = headerContentSection[2];
+			console.log(content)
+		}
 		const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-			chunkSize: 500,
+			chunkSize: 900,
 			chunkOverlap: 0,
 		});
-		const documents = await splitter.createDocuments([fileContent]);
-		const translatedContent = await textTranslator(model, documents, destlang);
-		// create file if it does not exist
-		if (!fs.existsSync(destinationFilePath)) {
-			fs.writeFileSync(destinationFilePath, "");
-		}
-		// write the result to the destination file
-		fs.writeFileSync(destinationFilePath, translatedContent);
+		const newDocs = await splitter.createDocuments([content]);
+		newDocs.forEach((doc) => {
+			documents.push(doc.pageContent);
+		});
+		
+		result = await textTranslator(ollama, documents, destlang, "mdx");
 	}
+	
+	// create file if it does not exist
+	if (!fs.existsSync(destinationFilePath)) {
+		fs.writeFileSync(destinationFilePath, "");
+	}
+	// write the result to the destination file
+	fs.writeFileSync(destinationFilePath,result);
+	
 };
 
 export const processor = async (fileFolderPath: string, destinationPath: string, destlang: string) => {

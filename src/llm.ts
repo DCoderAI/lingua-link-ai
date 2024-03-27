@@ -1,13 +1,14 @@
 import { OllamaFunctions } from "langchain/experimental/chat_models/ollama_functions";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { Ollama } from "@langchain/community/llms/ollama";
 
 const schema = z.object({
 	translated_text: z.string(),
 });
 
 
-const model = new OllamaFunctions({
+export const ollamaFunction = new OllamaFunctions({
 	temperature: 0.1,
 	model: process.env.OLLAMA_LLM_MODEL || "llama2",
 })
@@ -27,4 +28,8 @@ const model = new OllamaFunctions({
 		},
 	});
 
-export default model;
+export const ollama = new Ollama({
+	temperature: 0.3,
+	model: process.env.OLLAMA_LLM_MODEL || "llama2",
+})
+
