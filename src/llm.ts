@@ -1,0 +1,30 @@
+import { OllamaFunctions } from "langchain/experimental/chat_models/ollama_functions";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
+const schema = z.object({
+	translated_text: z.string(),
+});
+
+
+const model = new OllamaFunctions({
+	temperature: 0.1,
+	model: process.env.OLLAMA_LLM_MODEL || "llama2",
+})
+	.bind({
+		functions: [
+			{
+				name: "text_translation",
+				description: "Translate text from one language to another.",
+				parameters: {
+					type: "object",
+					properties: zodToJsonSchema(schema),
+				},
+			},
+		],
+		function_call: {
+			name: "text_translation",
+		},
+	});
+
+export default model;

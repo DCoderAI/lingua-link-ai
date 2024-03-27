@@ -1,0 +1,21 @@
+{
+  "name": "i18n-ai-translator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:DCoderAI/i18n-ai-translator.git",
+  "author": "Durgaprasad-Budhwani <durgaprasad.budhwani@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/credential-provider-node": "^3.535.0",
+    "@langchain/community": "^0.0.41",
+    "@langchain/core": "^0.1.51",
+    "@langchain/openai": "^0.0.23",
+    "langchain": "^0.1.28",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.5"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3"
+  }
+}
