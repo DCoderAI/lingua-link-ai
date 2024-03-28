@@ -10,7 +10,7 @@ export const schema = z.object({
 
 export const ollamaFunction = new OllamaFunctions({
 	temperature: 0.1,
-	model: "llama2",
+	model: "mistral",
 })
 	.bind({
 		functions: [
@@ -30,6 +30,6 @@ export const ollamaFunction = new OllamaFunctions({
 
 export const ollama = new Ollama({
 	temperature: 0.3,
-	model: "llama2",
+	model: "mistral",
 })
 

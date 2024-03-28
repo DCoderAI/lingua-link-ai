@@ -63,6 +63,7 @@ const TranslateStep = () => {
 	const runTranslation = useCallback(async () => {
 		console.log(`Source: ${source}, Destination: ${destination}, Language: ${language}`);
 		await processor(source, destination, language);
+		console.log(`Processing Completed`);
 		setStep('done');
 	}, [source, destination, language]);
 
@@ -127,6 +128,8 @@ const TranslateStep = () => {
 			);
 		case 'processing':
 			return <Text>Processing...</Text>;
+		case 'done':
+			return <Text>Translation complete.</Text>;
 		default:
 			return null;
 	}
