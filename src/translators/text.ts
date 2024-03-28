@@ -1,5 +1,5 @@
 import { PromptTemplate } from "@langchain/core/prompts";
-import { Ollama } from "@langchain/community/llms/ollama";
+import getLLMModel from "../llm.js";
 
 const JSON_TEMPLATE = `
 - For the json file format, do not change the keys and only translate the values. Do not remove $$$$$$$ from the keys.
@@ -40,7 +40,7 @@ Original Text Content:
 `;
 }
 
-const translate = async (model: Ollama, text: string, destLang: string, fileFormat: string = "text") => {
+const translate = async (model: any, text: string, destLang: string, fileFormat: string = "text") => {
 	try {
 		const prompt = PromptTemplate.fromTemplate(getTranslateTemplate(fileFormat));
 
@@ -50,7 +50,7 @@ const translate = async (model: Ollama, text: string, destLang: string, fileForm
 			destLang,
 			text,
 			fileFormat,
-		});
+		}) as string;
 
 		const regex1 = /Here is the translation \w.+/gi; // remove the full like
 		const regex2 = /Note: \w.+/gi; // remove the full like
@@ -65,7 +65,8 @@ const translate = async (model: Ollama, text: string, destLang: string, fileForm
 }
 
 
-const textTranslator = async (model: Ollama, documents: string[], destLang: string, fileFormat?: string) => {
+const textTranslator = async (documents: string[], destLang: string, fileFormat?: string) => {
+	const model = await getLLMModel();
 	const texts = [];
 	for (const document of documents) {
 		const content = await translate(model, document, destLang, fileFormat);
@@ -78,7 +79,8 @@ const textTranslator = async (model: Ollama, documents: string[], destLang: stri
 	return texts?.join("\n\n");
 }
 
-export const jsonTextTranslator = async (model: Ollama, documents: string[], destLang: string, fileFormat?: string) => {
+export const jsonTextTranslator = async (documents: string[], destLang: string, fileFormat?: string) => {
+	const model = await getLLMModel();
 	const texts = [];
 	for (const document of documents) {
 		const content = await translate(model, document, destLang, fileFormat);

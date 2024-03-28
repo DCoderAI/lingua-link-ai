@@ -10,6 +10,7 @@ import processor from "../processor.js";
 import LLMSelection from "./llm.js";
 import Ollama from "./ollama.js";
 import Bedrock from "./bedrock.js";
+import { Config } from "./type.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,23 +21,19 @@ type ConfigStepProps = {
 
 const ConfigStep = ({ onComplete }: ConfigStepProps) => {
 	const [llm, setLLM] = useState<string>();
-	const [model, setModel] = useState<string>();
 
-	const onModelSelection = useCallback(async (modelName: string) => {
-		setModel(modelName)
-		await fs.writeJson(path.join(__dirname, "..", 'config.json'), {llm, model: modelName});
+	const onModelSelection = useCallback(async (config: Config) => {
+		await fs.writeJson(path.join(__dirname, "..", 'config.json'), {llm, config});
 		onComplete();
-	}, [llm, model]);
+	}, [llm]);
 
 	if (!llm) {
 		return <LLMSelection onComplete={setLLM} />;
 	}
-	if (!model) {
-		if (llm === 'ollama') {
-			return <Ollama onComplete={onModelSelection} />;
-		} else if (llm === 'bedrock') {
-			return <Bedrock onComplete={onModelSelection} />;
-		}
+	if (llm === 'ollama') {
+		return <Ollama onComplete={onModelSelection} />;
+	} else if (llm === 'bedrock') {
+		return <Bedrock onComplete={onModelSelection} />;
 	}
 	return <Text>Configuration complete.</Text>;
 };

@@ -5,7 +5,7 @@ import Link from 'ink-link';
 import Spinner from 'ink-spinner';
 import sharedIniFileLoader from "@aws-sdk/shared-ini-file-loader";
 import TextInput from 'ink-text-input';
-import { SelectItem } from "./type.js";
+import { Config, SelectItem } from "./type.js";
 
 const profileOrAwsKey = [
 	{label: 'Profile', value: 'profile'},
@@ -14,7 +14,7 @@ const profileOrAwsKey = [
 
 
 type Props = {
-	onComplete: (llmModel: string) => void;
+	onComplete: (config: Config) => void;
 }
 const Bedrock = ({onComplete}: Props) => {
 	const [userProfileOrKeys, setUserProfileOrKeys] = useState<string>("");
@@ -22,15 +22,25 @@ const Bedrock = ({onComplete}: Props) => {
 	const [secretKey, setSecretKey] = useState<string>("");
 	const [region, setRegion] = useState<string>("");
 	const [profileKey, setProfileKey] = useState<string>("");
-	const [step, setStep] = useState<'accessKey' | 'secretKey' | 'region'>('accessKey');
+	const [model, setModel] = useState<string>("");
+	const [step, setStep] = useState<'accessKey' | 'secretKey' | 'region' | 'model'>('accessKey');
 	const [loading, setLoading] = useState(false);
 	const [profiles, setProfiles] = useState<string[]>([]);
 
 	const onSubmit = () => {
 		if (userProfileOrKeys === 'profile') {
-			onComplete(profileKey);
+			onComplete({
+				profile: profileKey,
+				region,
+				model,
+			});
 		} else {
-			onComplete('aws-key');
+			onComplete({
+				accessKey,
+				secretKey,
+				region,
+				model,
+			});
 		}
 	}
 
@@ -45,7 +55,7 @@ const Bedrock = ({onComplete}: Props) => {
 		setLoading(false);
 	}, []);
 
-	const handleAWSPRofileSelect = async (item: SelectItem) => {
+	const handleAccessMethodSelection = async (item: SelectItem) => {
 		setUserProfileOrKeys(item.value);
 		if (item.value === 'profile') {
 			loadProfiles();
@@ -77,7 +87,7 @@ const Bedrock = ({onComplete}: Props) => {
 					</Box>
 					<SelectInput
 						items={profileOrAwsKey}
-						onSelect={handleAWSPRofileSelect}
+						onSelect={handleAccessMethodSelection}
 					/>
 				</Box>
 			</Box>
@@ -108,7 +118,7 @@ const Bedrock = ({onComplete}: Props) => {
 					<TextInput
 						value={region}
 						onChange={setRegion}
-						onSubmit={onSubmit}
+						onSubmit={() => setStep('model')}
 					/>
 				</Box>
 			);
@@ -155,8 +165,30 @@ const Bedrock = ({onComplete}: Props) => {
 					<TextInput
 						value={region}
 						onChange={setRegion}
-						onSubmit={onSubmit}
+						onSubmit={() => setStep('model')}
 					/>
+				</Box>
+			);
+		}
+
+		if (step === 'model') {
+			return (
+				<Box flexDirection="column">
+					<Box width="100%" paddingBottom={1} flexDirection="column">
+						<Link url="https://aws.amazon.com/bedrock/?">
+							<Text color="cyan">Bedrock</Text>
+						</Link>
+					</Box>
+					<Box>
+						<Box marginRight={1}>
+							<Text>Enter Bedrock Model Name:</Text>
+						</Box>
+						<TextInput
+							value={model}
+							onChange={setModel}
+							onSubmit={onSubmit}
+						/>
+					</Box>
 				</Box>
 			);
 		}

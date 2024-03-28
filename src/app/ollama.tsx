@@ -3,15 +3,17 @@ import { Text, Box } from 'ink';
 import SelectInput from 'ink-select-input';
 import { getListOfTags } from "./ollama-api.js";
 import Link from 'ink-link';
+import { Config } from "./type.js";
+
 interface SelectItem {
 	label: string;
 	value: string;
 }
 
 type Props = {
-	onComplete: (llmModel: string) => void;
+	onComplete: (config: Config) => void;
 }
-const Ollama = ({ onComplete }: Props) => {
+const Ollama = ({onComplete}: Props) => {
 	const [hasOllamaInstalled, setHasOllamaInstalled] = useState(true);
 	const [hasMistralInstalled, setHasMistralInstalled] = useState(false);
 
@@ -26,7 +28,9 @@ const Ollama = ({ onComplete }: Props) => {
 				if (models.models.some(model => model.name.toLowerCase().includes('mistral'))) {
 					setHasMistralInstalled(true);
 					const mistralModel = models.models.find(model => model.name.toLowerCase().includes('mistral'));
-					onComplete(mistralModel?.name || "mistral");
+					onComplete({
+						model: mistralModel?.name || "mistral"
+					});
 				}
 			}
 		} catch (error) {
@@ -72,7 +76,7 @@ const Ollama = ({ onComplete }: Props) => {
 		);
 	}
 
-	if(!hasMistralInstalled){
+	if (!hasMistralInstalled) {
 		return (
 			<Box width="100%" flexDirection="column">
 				<Box width="100%" paddingBottom={1} flexDirection="column">

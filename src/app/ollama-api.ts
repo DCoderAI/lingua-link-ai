@@ -28,7 +28,6 @@ export const getListOfTags = async (): Promise<ModelsResponse> => {
 	} catch (error) {
 		console.error('Error fetching the list of tags:', error);
 		throw error; // Or handle the error as you see fit
-
 	}
 };
 

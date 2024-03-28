@@ -1,6 +1,5 @@
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import textTranslator from "../translators/text.js";
-import { ollama } from "../llm.js";
 
 export const translateMarkdownFile = async (fileContent: string, filePath: string, destlang: string) => {
 	const documents: string[] = [];
@@ -23,5 +22,5 @@ export const translateMarkdownFile = async (fileContent: string, filePath: strin
 		documents.push(doc.pageContent);
 	});
 
-	return await textTranslator(ollama, documents, destlang, "mdx");
+	return await textTranslator(documents, destlang, "mdx");
 };
