@@ -1,12 +1,12 @@
 import { Runnable } from "@langchain/core/runnables";
-import { BaseLanguageModelInput } from "@langchain/core/dist/language_models/base";
 import { BaseMessageChunk } from "@langchain/core/messages";
 import { ChatOllamaFunctionsCallOptions } from "langchain/experimental/chat_models/ollama_functions";
 import { JsonOutputFunctionsParser } from "langchain/output_parsers";
 import { PromptTemplate } from "@langchain/core/prompts";
+import { BaseLanguageModelInput } from "@langchain/core/language_models/base";
 const translateJSON = async (model: Runnable<BaseLanguageModelInput, BaseMessageChunk, any>, json: any, destLang: string): Promise<any> => {
 	const translatedJSON: any = {};
-	
+
 	// Translate each key-value pair
 	for (const key in json) {
 		if (json.hasOwnProperty(key)) {
@@ -21,7 +21,7 @@ const translateJSON = async (model: Runnable<BaseLanguageModelInput, BaseMessage
 			}
 		}
 	}
-	
+
 	return translatedJSON;
 };
 
@@ -55,7 +55,7 @@ const translate = async (model: Runnable<BaseLanguageModelInput, BaseMessageChun
 			text,
 			fileFormat
 		});
-		
+
 		// @ts-ignore
 		const translatedText = response?.translated_text ?? response?.type?.translated_text ?? response?.properties?.translated_text?.value ?? response?.properties?.translated_text?.example ?? response?.properties?.translated_text?.enum ?? response?.properties?.translated_text;
 		if (!translatedText) {
@@ -67,13 +67,13 @@ const translate = async (model: Runnable<BaseLanguageModelInput, BaseMessageChun
 		}
 		console.log("Translated text:", response);
 		return text;
-		
+
 	} catch (e) {
 		console.error(e);
 		return text;
 	}
-	
-	
+
+
 }
 
 export default jsonTranslator;

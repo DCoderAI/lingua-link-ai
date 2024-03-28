@@ -1,9 +1,9 @@
-import {  ollamaFunction, ollama } from "./llm";
+import {  ollamaFunction, ollama } from "./llm.js";
 import * as fs from "fs";
 import * as path from "path";
-import jsonTranslator from "./translators/json";
+import jsonTranslator from "./translators/json.js";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import textTranslator from "./translators/text";
+import textTranslator from "./translators/text.js";
 
 export const processFile = async (filePath: string, destinationFilePath: string, destlang: string) => {
 	const fileContent = fs.readFileSync(filePath, "utf-8");
@@ -11,7 +11,7 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 	// if file extension is JSON then run jsonTranslator
 	if (filePath.endsWith(".json")) {
 		const translatedContent = await jsonTranslator(ollamaFunction, fileContent, destlang);
-		result =  JSON.stringify(result);
+		result =  JSON.stringify(translatedContent);
 	} else if (filePath.endsWith(".txt")) {
 		// if file extension is txt then run textTranslator
 		throw new Error("Text translation is not supported yet");
@@ -32,7 +32,7 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 			const header = headerContentSection[1];
 			console.log({ header: `---${header}---` });
 			documents.push(`---${header}---`);
-			content = headerContentSection[2];
+			content = headerContentSection[2] as string;
 			console.log(content)
 		}
 		const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
@@ -43,17 +43,17 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 		newDocs.forEach((doc) => {
 			documents.push(doc.pageContent);
 		});
-		
+
 		result = await textTranslator(ollama, documents, destlang, "mdx");
 	}
-	
+
 	// create file if it does not exist
 	if (!fs.existsSync(destinationFilePath)) {
 		fs.writeFileSync(destinationFilePath, "");
 	}
 	// write the result to the destination file
 	fs.writeFileSync(destinationFilePath,result);
-	
+
 };
 
 export const processor = async (fileFolderPath: string, destinationPath: string, destlang: string) => {
@@ -61,18 +61,18 @@ export const processor = async (fileFolderPath: string, destinationPath: string,
 	if (!fs.existsSync(fileFolderPath)) {
 		throw new Error("Invalid file folder path");
 	}
-	
+
 	if (fs.lstatSync(fileFolderPath).isDirectory()) {
 		// take one file at a tile and pass it to the translation model
 		const files = fs.readdirSync(fileFolderPath);
-		
+
 		for (const file of files) {
 			console.log("Processing file: ", file)
 			const filePath = path.join(fileFolderPath, file);
 			const destinationFilePath = path.join(destinationPath, file);
 			await processFile(filePath, destinationFilePath, destlang);
 		}
-		
+
 		// else check if the fileFolderPath is a file
 	} else if (fs.lstatSync(fileFolderPath).isFile()) {
 		console.log("Processing file");

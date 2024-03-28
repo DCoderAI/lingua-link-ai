@@ -1,4 +1,3 @@
-import { Document } from "@langchain/core/documents";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Ollama } from "@langchain/community/llms/ollama";
 
@@ -32,12 +31,12 @@ const translate = async (model: Ollama, text: string, destLang: string, fileForm
 			text,
 			fileFormat,
 		});
-		
+
 		const regex1 = /Here is the translation \w.+/gi; // remove the full like
 		const regex2 = /Note: \w.+/gi; // remove the full like
 		const regex3 = /Sure, \w.+/gi; // remove the full like
 		return response.replace(regex1, "").replace(regex2, "").replace(regex3, "");
-		
+
 	} catch (e) {
 		console.error(e);
 		return text;

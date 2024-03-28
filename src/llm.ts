@@ -3,14 +3,14 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { Ollama } from "@langchain/community/llms/ollama";
 
-const schema = z.object({
+export const schema = z.object({
 	translated_text: z.string(),
 });
 
 
 export const ollamaFunction = new OllamaFunctions({
 	temperature: 0.1,
-	model: process.env.OLLAMA_LLM_MODEL || "llama2",
+	model: "llama2",
 })
 	.bind({
 		functions: [
@@ -30,6 +30,6 @@ export const ollamaFunction = new OllamaFunctions({
 
 export const ollama = new Ollama({
 	temperature: 0.3,
-	model: process.env.OLLAMA_LLM_MODEL || "llama2",
+	model: "llama2",
 })
 

@@ -1,4 +1,4 @@
-import processor from "./processor";
+import processor from "./processor.js";
 
 const languages = [
 	// {"name": "English", "code": "en"},
@@ -61,7 +61,7 @@ const cli = async () => {
 		await processor("/Volumes/Code/DCoderAI/site/messages/en.json", `/Volumes/Code/DCoderAI/site/messages/${lang.code}.json`, lang.name);
 		console.log(`Translation to ${lang.name} completed`)
 	}
-	
+
 	// await processor("/Volumes/Code/DCoderAI/langchain-i18n-converter/messages/en.json", "/Volumes/Code/DCoderAI/langchain-i18n-converter/messages/de.json", "German");
 	console.log('Translation completed')
 }
