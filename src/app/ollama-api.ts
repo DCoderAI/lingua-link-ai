@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-interface ModelDetail {
+export interface ModelDetail {
 	format: string;
 	family: string;
 	families: null | string[];
@@ -8,7 +8,7 @@ interface ModelDetail {
 	quantization_level: string;
 }
 
-interface Model {
+export interface Model {
 	name: string;
 	modified_at: string;
 	size: number;
@@ -16,7 +16,7 @@ interface Model {
 	details: ModelDetail;
 }
 
-interface ModelsResponse {
+export interface ModelsResponse {
 	models: Model[];
 }
 
@@ -32,9 +32,3 @@ export const getListOfTags = async (): Promise<ModelsResponse> => {
 	}
 };
 
-// Call the function
-// getListOfTags().then(models => {
-// 	console.log('Models:', models);
-// }).catch(error => {
-// 	console.error('Failed to fetch models:', error);
-// });

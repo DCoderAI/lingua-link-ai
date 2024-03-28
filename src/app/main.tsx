@@ -4,54 +4,41 @@ import SelectInput from 'ink-select-input';
 import TextInput from 'ink-text-input';
 import fs from 'fs-extra';
 import path from 'path';
-import { getListOfTags } from "./ollama.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import processor from "./processor.js";
+import processor from "../processor.js";
+import LLMSelection from "./llm.js";
+import Ollama from "./ollama.js";
+import Bedrock from "./bedrock.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-interface SelectItem {
-	label: string;
-	value: string;
+type ConfigStepProps = {
+	onComplete: () => void;
 }
 
-const ConfigStep = () => {
-	const [completed, setCompleted] = useState(false);
-	const [models, setModels] = useState<SelectItem[]>([]);
+const ConfigStep = ({ onComplete }: ConfigStepProps) => {
+	const [llm, setLLM] = useState<string>();
+	const [model, setModel] = useState<string>();
 
-	const getModels = useCallback(async () => {
-		// Fetch available models from API
-		const models = await getListOfTags();
-		setModels(models.models.map(model => ({ label: model.name, value: model.name })));
-		// Update models state
-	}, []);
+	const onModelSelection = useCallback(async (modelName: string) => {
+		setModel(modelName)
+		await fs.writeJson(path.join(__dirname, "..", 'config.json'), {llm, model: modelName});
+		onComplete();
+	}, [llm, model]);
 
-	useEffect(() => {
-		getModels();
-	}, [])
-
-	const handleSelect = async (item: SelectItem) => {
-		// Save selected model to config file
-		await fs.writeJson(path.join(__dirname, 'config.json'), { ollamaModel: item.value });
-		console.log('Configuration saved.');
-		setCompleted(true);
-	};
-
-	if (completed) {
-		return <Text>Configuration complete. You can now run the translate command.</Text>;
+	if (!llm) {
+		return <LLMSelection onComplete={setLLM} />;
 	}
-
-	return (
-		<Box>
-			<Text>Select the Ollama Model:</Text>
-			<SelectInput
-				items={models}
-				onSelect={handleSelect}
-			/>
-		</Box>
-	);
+	if (!model) {
+		if (llm === 'ollama') {
+			return <Ollama onComplete={onModelSelection} />;
+		} else if (llm === 'bedrock') {
+			return <Bedrock onComplete={onModelSelection} />;
+		}
+	}
+	return <Text>Configuration complete.</Text>;
 };
 
 const TranslateStep = () => {
@@ -162,7 +149,9 @@ const App = () => {
 
 	// Determine which step to render based on command-line arguments or stored config
 
-	return currentStep === 'config' ? <ConfigStep /> : <TranslateStep />;
+	return currentStep === 'config' ? <ConfigStep onComplete={() => {
+		console.log("Completed")
+	}} /> : <TranslateStep />;
 };
 
 export default App;
