@@ -1,17 +1,27 @@
-import {  ollamaFunction, ollama } from "./llm.js";
+import { ollama } from "./llm.js";
 import * as fs from "fs";
 import * as path from "path";
-import jsonTranslator from "./translators/json.js";
+// import jsonTranslator from "./translators/json.js";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import textTranslator from "./translators/text.js";
+import textTranslator, { jsonTextTranslator } from "./translators/text.js";
+import { recombineJsonChunks, splitJsonObject } from "./splitters/json.js";
 
 export const processFile = async (filePath: string, destinationFilePath: string, destlang: string) => {
 	const fileContent = fs.readFileSync(filePath, "utf-8");
 	let result = "";
 	// if file extension is JSON then run jsonTranslator
 	if (filePath.endsWith(".json")) {
-		const translatedContent = await jsonTranslator(ollamaFunction, fileContent, destlang);
-		result =  JSON.stringify(translatedContent);
+		// const translatedContent = await jsonTranslator(ollamaFunction, fileContent, destlang);
+		// result =  JSON.stringify(translatedContent);
+
+		const jsonData = JSON.parse(fileContent);
+		const chunks = splitJsonObject(jsonData, 500);
+		const documents: string[] = [];
+		chunks.forEach((chunk) => {
+			documents.push(JSON.stringify(chunk));
+		});
+		const responseChunks = await jsonTextTranslator(ollama, documents, destlang, "json");
+		result = JSON.stringify(recombineJsonChunks(responseChunks))
 	} else if (filePath.endsWith(".txt")) {
 		// if file extension is txt then run textTranslator
 		throw new Error("Text translation is not supported yet");
@@ -30,7 +40,7 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 			// split the header and content
 			let headerContentSection = fileContent.split("---");
 			const header = headerContentSection[1];
-			console.log({ header: `---${header}---` });
+			console.log({header: `---${header}---`});
 			documents.push(`---${header}---`);
 			content = headerContentSection[2] as string;
 			console.log(content)
@@ -52,7 +62,7 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 		fs.writeFileSync(destinationFilePath, "");
 	}
 	// write the result to the destination file
-	fs.writeFileSync(destinationFilePath,result);
+	fs.writeFileSync(destinationFilePath, result);
 
 };
 
