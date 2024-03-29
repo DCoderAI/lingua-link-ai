@@ -17,6 +17,7 @@ const textTranslator = async (documents: string[], destLang: string, fileFormat?
 	return texts?.join("\n\n");
 }
 
+//  @ts-ignore
 function extractAndCorrectJsonFromText(text: string) {
 	const lines = text.split('\n');
 	let correctedJson = null;
@@ -73,14 +74,17 @@ export const jsonTextTranslator = async (documents: string[], destLang: string, 
 				content = await translate(document, destLang, fileFormat);
 				// console.log("=====================================")
 				// console.log(document)
-				// console.log(content)
-				// console.log("=====================================")
+
 				// Try parsing the content right after fetching it
 				try {
-					const parsedContent = extractAndCorrectJsonFromText(content);
-					if (parsedContent === null) {
-						throw new Error("No valid JSON object found in the translation");
-					}
+					// const parsedContent = extractAndCorrectJsonFromText(content);
+					const parsedContent = JSON.parse(content);
+					// if (parsedContent === null) {
+					// 	throw new Error("No valid JSON object found in the translation");
+					// }
+					// console.log(content)
+					// console.log(parsedContent)
+					// console.log("=====================================")
 					texts.push(parsedContent);
 					break; // Exit the loop if translation and parsing are successful
 				} catch (parseError) {
@@ -105,9 +109,7 @@ export const jsonTextTranslator = async (documents: string[], destLang: string, 
 		progress?.((index / documents.length) * 100);
 	}
 
-	// return { texts, errors }; // Include errors in the result
 	return texts;
-	// TODO handle errors as well
 };
 
 
