@@ -5,6 +5,7 @@ import { translateMarkdownFile } from "./formats/markdown.js";
 import { translateJsonFile } from "./formats/json.js";
 import { EventList } from "./app/type.js";
 
+const supportedFileExtensions = [".json", ".csv", ".tsv", ".md", ".mdx"];
 
 export const processFile = async (filePath: string, destinationFilePath: string, destlang: string, progress?: (percentage: number) => void) => {
 	const fileContent = fs.readFileSync(filePath, "utf-8");
@@ -31,6 +32,7 @@ export const processFile = async (filePath: string, destinationFilePath: string,
 
 };
 
+
 export const processor = async (fileFolderPath: string, destinationPath: string, destlang: string, onProgress?: (events: EventList) => void) => {
 	// check if the fileFolderPath exists and is a directory
 	const events: EventList = [];
@@ -44,6 +46,9 @@ export const processor = async (fileFolderPath: string, destinationPath: string,
 
 		// update event list
 		for (const file of files) {
+			if (!supportedFileExtensions.includes(path.extname(file))) {
+				continue;
+			}
 			events.push({
 				name: file,
 				status: "pending",
@@ -55,6 +60,9 @@ export const processor = async (fileFolderPath: string, destinationPath: string,
 		onProgress?.([...events]);
 
 		for (const file of files) {
+			if (!supportedFileExtensions.includes(path.extname(file))) {
+				continue;
+			}
 			const index = events.findIndex((event) => event.name === file);
 			if (events?.[index]) {
 				// @ts-ignore

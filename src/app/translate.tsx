@@ -78,9 +78,12 @@ const Translate = () => {
 					<AutoComplete
 						title="Enter target language:"
 						value={language}
-						items={languages?.map((lang) => ({ label: lang.name, value: lang.name }))}
 						onChange={setLanguage}
-						onSubmit={() => setStep('processing')}
+						items={languages?.map((lang) => ({ label: lang.name, value: lang.name }))}
+						onSubmit={(item) => {
+							setLanguage(item.value);
+							setStep('processing');
+						}}
 					/>
 				</Box>
 			);

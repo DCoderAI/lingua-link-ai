@@ -1,5 +1,5 @@
 {
-  "name": "i18n-ai-translator",
+  "name": "lingua-link-ai",
   "version": "1.0.0",
   "main": "index.js",
   "bin": "dist/cli.js",
