@@ -24,7 +24,6 @@ const MDX_TEMPLATE = `
 `
 
 const getTranslateTemplate = (fileFormat: string) => {
-	console.log("File format:", fileFormat)
 	let additionalInstruction = "";
 	if (fileFormat === "json") {
 		additionalInstruction = JSON_TEMPLATE;
