@@ -18,6 +18,7 @@ const JSON_TEMPLATE = `
 - For  the json file format, the translated text should add closing curly brackets to nested object if it is missed. This has been missed multiple times.
 - For the json file format, the translated text do not change the case of the keys. Keep the keys in the same case as they are in the text input.
 - For the json file format, the translated content is directly sent to JSON.parse() function. Make sure to return only valid JSON data or it will failed to parse.
+- For the json file format, don't use "，", use comma "," instead.
 `
 
 const MDX_TEMPLATE = `
@@ -72,11 +73,19 @@ export const translate = async (text: string, destLang: string, fileFormat: stri
 
 	switch (configuration.llm) {
 		case "ollama":
+			let ollamaContent = response;
+			if (fileFormat === "json") {
+				// remove new line and extra spaces
+				const commentRegex = /^\/\/.*\n?/gm;
+				const newLineRegex = /[\n\r]/g;
+				ollamaContent =  response.replace(commentRegex, "").replace(newLineRegex, "").replace("，", ",");
+				console.log(ollamaContent);
+			}
 			const regex1 = /Here is the translation \w.+/gi; // remove the full like
 			const regex2 = /Note: \w.+/gi; // remove the full like
 			const regex3 = /Sure, \w.+/gi; // remove the full like
 			const regex4 = /^.*Translation: \w.+/;
-			return response.replace(regex1, "").replace(regex2, "").replace(regex3, "").replace(regex4, "");
+			return ollamaContent.replace(regex1, "").replace(regex2, "").replace(regex3, "").replace(regex4, "");
 		case "bedrock":
 			const content = response?.content;
 			if (fileFormat === "json") {
@@ -105,7 +114,7 @@ const getLLMModel = () => {
 		if (configuration.llm === "ollama") {
 			const newConfig = configuration.config as Ollama;
 			return new Ollama({
-				temperature: 0.1,
+				temperature: 0.3,
 				model: newConfig.model,
 			});
 		}
