@@ -15,7 +15,7 @@ type Props = {
 }
 const Ollama = ({onComplete}: Props) => {
 	const [hasOllamaInstalled, setHasOllamaInstalled] = useState(true);
-	const [hasMistralInstalled, setHasMistralInstalled] = useState(false);
+	const [hasLLAMA2Installed, setHasLLAMA2Installed] = useState(false);
 
 	const getModels = useCallback(async () => {
 		// Fetch available models from API
@@ -25,11 +25,11 @@ const Ollama = ({onComplete}: Props) => {
 				console.log('No models found in Ollama');
 				setHasOllamaInstalled(false);
 			} else {
-				if (models.models.some(model => model.name.toLowerCase().includes('mistral'))) {
-					setHasMistralInstalled(true);
-					const mistralModel = models.models.find(model => model.name.toLowerCase().includes('mistral'));
+				if (models.models.some(model => model.name.toLowerCase().includes('llama2'))) {
+					setHasLLAMA2Installed(true);
+					const LLAMA2Model = models.models.find(model => model.name.toLowerCase().includes('llama2'));
 					onComplete({
-						model: mistralModel?.name || "mistral"
+						model: LLAMA2Model?.name || "llama2"
 					});
 				}
 			}
@@ -76,25 +76,25 @@ const Ollama = ({onComplete}: Props) => {
 		);
 	}
 
-	if (!hasMistralInstalled) {
+	if (!hasLLAMA2Installed) {
 		return (
 			<Box width="100%" flexDirection="column">
 				<Box width="100%" paddingBottom={1} flexDirection="column">
 					<Box width="100%">
 						<Text>
-							If Mistral is not installed, run the following command in Ollama to install it:
+							If LLAMA2 is not installed, run the following command in Ollama to install it:
 						</Text>
 					</Box>
 					<Box width="100%">
-						<Text color="red">ollama serve mistral</Text>
+						<Text color="red">ollama serve llama2</Text>
 					</Box>
-					<Link url="https://ollama.com/library/mistral">
-						<Text color="cyan">Ollama Mistral</Text>
+					<Link url="https://ollama.com/library/llama2">
+						<Text color="cyan">Please install Ollama LLAMA2</Text>
 					</Link>
 				</Box>
 				<Box flexDirection="column">
 					<Box>
-						<Text>Have you installed Mistral Model?</Text>
+						<Text>Have you installed LLAMA2 Model?</Text>
 					</Box>
 					<SelectInput
 						items={[

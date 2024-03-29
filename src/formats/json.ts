@@ -3,7 +3,7 @@ import { jsonTextTranslator } from "../translators/text.js";
 
 export const translateJsonFile = async (fileContent: string, destlang: string, progress?: (percentage: number) => void) => {
 	const jsonData = JSON.parse(fileContent);
-	const chunks = splitJsonObject(jsonData, 500);
+	const chunks = splitJsonObject(jsonData, 350);
 	const documents: string[] = [];
 	chunks.forEach((chunk) => {
 		documents.push(JSON.stringify(chunk));

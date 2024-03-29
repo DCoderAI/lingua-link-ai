@@ -14,8 +14,9 @@ import { ChatOpenAI } from "@langchain/openai";
 
 const JSON_TEMPLATE = `
 - For the json file format, the translated text do not change the keys and only translate the values. Do not remove $$$$$$$ from the keys.
+- For the json file format, the translated text should also change values of the arrays. But do not change the key and order of the array if there is nested array.
 - For the json file format, the translated text every key is very important, do not miss any key.
-- For  the json file format, the translated text should add closing curly brackets to nested object if it is missed. This has been missed multiple times.
+- For the json file format, the translated text should add closing curly brackets to nested object if it is missed. This has been missed multiple times.
 - For the json file format, the translated text do not change the case of the keys. Keep the keys in the same case as they are in the text input.
 - For the json file format, the translated content is directly sent to JSON.parse() function. Make sure to return only valid JSON data or it will failed to parse.
 - For the json file format, don't use "，", use comma "," instead.
@@ -36,7 +37,7 @@ const getTranslateTemplate = (fileFormat: string) => {
 	}
 	return `
 Instructions for Translation:
-- Translate the following sentence from English to {destLang}
+- Translate the following sentence to {destLang}
 - Keep the file format {fileFormat} same.
 - The translated text will be directly written to the file.
 - The translated text should not worry about the perfect translation.
@@ -54,6 +55,44 @@ ${additionalInstruction}
 Original Text Content:
 {text}
 `;
+}
+
+function extractAndCorrectJsonFromText(text: string) {
+	const lines = text.split('\n');
+	let correctedJson = null;
+
+	for (const line of lines) {
+		// Simplistic check to find a line that looks like it starts with JSON
+		if (line.trim().startsWith('{')) {
+			// Attempt to correct and parse the JSON
+			try {
+				correctedJson = correctJsonStructure(line);
+				// Attempt to parse to check validity
+				return JSON.parse(correctedJson);
+			} catch (error) {
+				console.error("Found JSON-like line, but couldn't correct or parse it:", line);
+				// Optionally, handle the error or attempt further corrections
+			}
+		}
+	}
+
+	return correctedJson;
+}
+
+function correctJsonStructure(jsonString: string) {
+	let balance = 0;
+	let correctedString = '';
+
+	for (const char of jsonString) {
+		correctedString += char;
+		if (char === '{') balance++;
+		if (char === '}') balance--;
+	}
+
+	// If there are more opening braces, add the necessary closing braces
+	if (balance > 0) correctedString += '}'.repeat(balance);
+
+	return correctedString;
 }
 
 
@@ -75,11 +114,7 @@ export const translate = async (text: string, destLang: string, fileFormat: stri
 		case "ollama":
 			let ollamaContent = response;
 			if (fileFormat === "json") {
-				// remove new line and extra spaces
-				const commentRegex = /^\/\/.*\n?/gm;
-				const newLineRegex = /[\n\r]/g;
-				ollamaContent =  response.replace(commentRegex, "").replace(newLineRegex, "").replace("，", ",");
-				console.log(ollamaContent);
+				return JSON.stringify(extractAndCorrectJsonFromText(ollamaContent), null, 2);
 			}
 			const regex1 = /Here is the translation \w.+/gi; // remove the full like
 			const regex2 = /Note: \w.+/gi; // remove the full like
@@ -112,10 +147,11 @@ const getLLMModel = () => {
 	const configuration = fs.readJsonSync(configPath) as any;
 	if (configuration.llm) {
 		if (configuration.llm === "ollama") {
+			// @ts-ignore
 			const newConfig = configuration.config as Ollama;
 			return new Ollama({
-				temperature: 0.3,
-				model: newConfig.model,
+				temperature: 0.1,
+				model: 'llama2', //newConfig.model,
 			});
 		}
 		if (configuration.llm === "bedrock") {

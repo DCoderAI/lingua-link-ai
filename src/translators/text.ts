@@ -17,44 +17,7 @@ const textTranslator = async (documents: string[], destLang: string, fileFormat?
 	return texts?.join("\n\n");
 }
 
-//  @ts-ignore
-function extractAndCorrectJsonFromText(text: string) {
-	const lines = text.split('\n');
-	let correctedJson = null;
 
-	for (const line of lines) {
-		// Simplistic check to find a line that looks like it starts with JSON
-		if (line.trim().startsWith('{')) {
-			// Attempt to correct and parse the JSON
-			try {
-				correctedJson = correctJsonStructure(line);
-				// Attempt to parse to check validity
-				return JSON.parse(correctedJson);
-			} catch (error) {
-				console.error("Found JSON-like line, but couldn't correct or parse it:", line);
-				// Optionally, handle the error or attempt further corrections
-			}
-		}
-	}
-
-	return correctedJson;
-}
-
-function correctJsonStructure(jsonString: string) {
-	let balance = 0;
-	let correctedString = '';
-
-	for (const char of jsonString) {
-		correctedString += char;
-		if (char === '{') balance++;
-		if (char === '}') balance--;
-	}
-
-	// If there are more opening braces, add the necessary closing braces
-	if (balance > 0) correctedString += '}'.repeat(balance);
-
-	return correctedString;
-}
 
 
 
