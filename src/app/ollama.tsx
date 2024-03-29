@@ -27,6 +27,7 @@ const Ollama = ({onComplete}: Props) => {
 			} else {
 				if (models.models.some(model => model.name.toLowerCase().includes('llama2'))) {
 					setHasLLAMA2Installed(true);
+					console.log('LLAMA2 is configured for Ollama');
 					const LLAMA2Model = models.models.find(model => model.name.toLowerCase().includes('llama2'));
 					onComplete({
 						model: LLAMA2Model?.name || "llama2"
