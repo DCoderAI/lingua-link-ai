@@ -105,25 +105,12 @@ const Bedrock = ({onComplete}: Props) => {
 						items={profiles.map(profile => ({label: profile, value: profile}))}
 						onSelect={({value}) => {
 							setProfileKey(value);
+							setStep('region');
 						}}
 					/>
 				</Box>
 			);
-		} else {
-			return (
-				<Box>
-					<Box marginRight={1}>
-						<Text>Enter AWS Region:</Text>
-					</Box>
-					<TextInput
-						value={region}
-						onChange={setRegion}
-						onSubmit={() => setStep('model')}
-					/>
-				</Box>
-			);
 		}
-
 	}
 
 	if (userProfileOrKeys === 'aws-key') {
@@ -155,44 +142,45 @@ const Bedrock = ({onComplete}: Props) => {
 				</Box>
 			);
 		}
+	}
 
-		if (step === 'region') {
-			return (
+	if (step === 'region') {
+		return (
+			<Box>
+				<Box marginRight={1}>
+					<Text>Enter AWS Region:</Text>
+				</Box>
+				<TextInput
+					value={region}
+					onChange={setRegion}
+					onSubmit={() => setStep('model')}
+				/>
+			</Box>
+		);
+	}
+
+	if (step === 'model') {
+		return (
+			<Box flexDirection="column">
+				<Box width="100%" paddingBottom={1} flexDirection="column">
+					<Link url="https://aws.amazon.com/bedrock/?">
+						<Text color="cyan">Bedrock</Text>
+					</Link>
+				</Box>
 				<Box>
 					<Box marginRight={1}>
-						<Text>Enter AWS Region:</Text>
+						<Text>Enter Bedrock Model Name:</Text>
 					</Box>
 					<TextInput
-						value={region}
-						onChange={setRegion}
-						onSubmit={() => setStep('model')}
+						value={model}
+						onChange={setModel}
+						onSubmit={onSubmit}
 					/>
 				</Box>
-			);
-		}
-
-		if (step === 'model') {
-			return (
-				<Box flexDirection="column">
-					<Box width="100%" paddingBottom={1} flexDirection="column">
-						<Link url="https://aws.amazon.com/bedrock/?">
-							<Text color="cyan">Bedrock</Text>
-						</Link>
-					</Box>
-					<Box>
-						<Box marginRight={1}>
-							<Text>Enter Bedrock Model Name:</Text>
-						</Box>
-						<TextInput
-							value={model}
-							onChange={setModel}
-							onSubmit={onSubmit}
-						/>
-					</Box>
-				</Box>
-			);
-		}
+			</Box>
+		);
 	}
+
 	return <Text>Configuration complete. You can now run the translate command.</Text>;
 };
 

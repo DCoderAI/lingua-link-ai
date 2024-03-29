@@ -65,32 +65,39 @@ const translate = async (model: any, text: string, destLang: string, fileFormat:
 }
 
 
-const textTranslator = async (documents: string[], destLang: string, fileFormat?: string) => {
+const textTranslator = async (documents: string[], destLang: string, fileFormat?: string, progress?: (percentage: number) => void) => {
 	const model = await getLLMModel();
 	const texts = [];
+	progress?.(0);
+	let index = 0;
 	for (const document of documents) {
 		const content = await translate(model, document, destLang, fileFormat);
-		console.log("=====================================")
-		console.log(document)
-		console.log(content)
-		console.log("=====================================")
+		index++;
+		progress?.((index / documents.length) * 100);
+		// console.log("=====================================")
+		// console.log(document)
+		// console.log(content)
+		// console.log("=====================================")
 		texts.push(content);
 	}
 	return texts?.join("\n\n");
 }
 
-export const jsonTextTranslator = async (documents: string[], destLang: string, fileFormat?: string) => {
+export const jsonTextTranslator = async (documents: string[], destLang: string, fileFormat?: string, progress?: (percentage: number) => void) => {
 	const model = await getLLMModel();
 	const texts = [];
+	progress?.(0);
+	let index = 0;
 	for (const document of documents) {
 		const content = await translate(model, document, destLang, fileFormat);
+		index++;
+		progress?.((index / documents.length) * 100);
 		console.log("=====================================")
 		console.log(document)
 		console.log(content)
 		console.log("=====================================")
 		texts.push(JSON.parse(content));
 	}
-	// console.log(JSON.stringify(texts))
 	return texts;
 }
 

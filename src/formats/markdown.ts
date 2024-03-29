@@ -1,7 +1,7 @@
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import textTranslator from "../translators/text.js";
 
-export const translateMarkdownFile = async (fileContent: string, filePath: string, destlang: string) => {
+export const translateMarkdownFile = async (fileContent: string, filePath: string, destlang: string, progress?: (percentage: number) => void) => {
 	const documents: string[] = [];
 	let content = fileContent;
 	if (filePath.endsWith(".mdx")) {
@@ -22,5 +22,5 @@ export const translateMarkdownFile = async (fileContent: string, filePath: strin
 		documents.push(doc.pageContent);
 	});
 
-	return await textTranslator(documents, destlang, "mdx");
+	return await textTranslator(documents, destlang, "mdx", progress);
 };
