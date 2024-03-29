@@ -23,7 +23,7 @@ export interface ModelsResponse {
 // Function to get the list of models (tags) from Ollama
 export const getListOfTags = async (): Promise<ModelsResponse> => {
 	try {
-		const response = await axios.get<ModelsResponse>('http://localhost:11434/api/tags');
+		const response = await axios.get<ModelsResponse>('http://127.0.0.1:11434/api/tags');
 		return response.data;
 	} catch (error) {
 		console.error('Error fetching the list of tags:', error);
