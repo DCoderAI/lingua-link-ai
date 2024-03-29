@@ -164,13 +164,13 @@ const Bedrock = ({onComplete}: Props) => {
 		return (
 			<Box flexDirection="column">
 				<Box width="100%" paddingBottom={1} flexDirection="column">
-					<Link url="https://aws.amazon.com/bedrock/?">
-						<Text color="cyan">Bedrock</Text>
+					<Link url="https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html">
+						<Text color="cyan">Get the Bedrock Model ID:</Text>
 					</Link>
 				</Box>
 				<Box>
 					<Box marginRight={1}>
-						<Text>Enter Bedrock Model Name:</Text>
+						<Text>Enter Bedrock Model ID:</Text>
 					</Box>
 					<TextInput
 						value={model}

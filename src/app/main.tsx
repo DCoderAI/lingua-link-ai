@@ -11,6 +11,7 @@ import { Config } from "./type.js";
 import Translate from "./translate.js";
 import Gradient from 'ink-gradient';
 import BigText from 'ink-big-text';
+import OpenAI from "./open-ai.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,6 +35,8 @@ const ConfigStep = ({onComplete}: ConfigStepProps) => {
 		return <Ollama onComplete={onModelSelection}/>;
 	} else if (llm === 'bedrock') {
 		return <Bedrock onComplete={onModelSelection}/>;
+	} else if (llm === 'open-ai') {
+		return <OpenAI onComplete={onModelSelection}/>;
 	}
 	return <Text>Configuration complete.</Text>;
 };

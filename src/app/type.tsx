@@ -38,4 +38,4 @@ export type EventList = Event[];
 export type BedrockModel = BedrockModelProfile | BedrockModelAwsKey;
 
 
-export type Config = OllamaModel | OpenAIModel | BedrockModel;
+export type Config = OllamaModel| OpenAIModel | BedrockModel;
