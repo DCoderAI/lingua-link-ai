@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import processor from "../processor.js";
-import SelectInput from 'ink-select-input';
 import TextInput from 'ink-text-input';
 import { Text, Box, useInput } from 'ink';
 import { EventList } from "./type.js";
 import Table from "./table.js";
 import {useApp} from 'ink';
+import languages from "./languages.js";
+import AutoComplete from "./auto-complete.js";
 
 const Translate = () => {
 	const [step, setStep] = useState<'source' | 'destination' | 'language' | 'processing' | 'done'>('source');
 	const [source, setSource] = useState<string>('');
 	const [destination, setDestination] = useState<string>('');
-	const [language, setLanguage] = useState<string>('');
+	const [language, setLanguage] = useState<any>('');
 	const [events, setEvents] = useState<EventList>([]);
 	const {exit} = useApp();
 
@@ -73,20 +74,13 @@ const Translate = () => {
 			);
 		case 'language':
 			return (
-				<Box>
-					<Box>
-						<Text>Select language:</Text>
-					</Box>
-					<SelectInput
-						items={[
-							{label: 'English', value: 'English'},
-							{label: 'Spanish', value: 'Spanish'},
-							// Add more languages as needed
-						]}
-						onSelect={({value}) => {
-							setLanguage(value);
-							setStep('processing');
-						}}
+				<Box flexDirection="column" width="100%">
+					<AutoComplete
+						title="Enter target language:"
+						value={language}
+						items={languages?.map((lang) => ({ label: lang.name, value: lang.name }))}
+						onChange={setLanguage}
+						onSubmit={() => setStep('processing')}
 					/>
 				</Box>
 			);
