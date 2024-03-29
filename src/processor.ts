@@ -45,17 +45,17 @@ export const processor = async (fileFolderPath: string, destinationPath: string,
 		// update event list
 		for (const file of files) {
 			events.push({
-				fileName: file,
+				name: file,
 				status: "pending",
 				location: path.join(fileFolderPath, file),
-				processedPercentage: 0,
+				percentage: 0,
 			});
 		}
 
 		onProgress?.([...events]);
 
 		for (const file of files) {
-			const index = events.findIndex((event) => event.fileName === file);
+			const index = events.findIndex((event) => event.name === file);
 			if (events?.[index]) {
 				// @ts-ignore
 				events[index].status = "processing";
@@ -64,7 +64,7 @@ export const processor = async (fileFolderPath: string, destinationPath: string,
 			const progress = (percentage: number) => {
 				if (events?.[index]) {
 					// @ts-ignore
-					events[index].processedPercentage = percentage;
+					events[index].percentage = percentage;
 					onProgress?.([...events]);
 				}
 			}
@@ -81,15 +81,15 @@ export const processor = async (fileFolderPath: string, destinationPath: string,
 		// else check if the fileFolderPath is a file
 	} else if (fs.lstatSync(fileFolderPath).isFile()) {
 		events.push({
-			fileName: path.basename(fileFolderPath),
+			name: path.basename(fileFolderPath),
 			status: "processing",
 			location: fileFolderPath,
-			processedPercentage: 0,
+			percentage: 0,
 		});
 
 		const progress = (percentage: number) => {
 			if (events?.[0])  {
-				events[0].processedPercentage = percentage;
+				events[0].percentage = percentage;
 				onProgress?.([...events]);
 			}
 		}

@@ -26,10 +26,10 @@ export type BedrockModelAwsKey = {
 }
 
 export type Event = {
-	fileName: string;
+	name: string;
 	location: string;
 	status: 'pending' | 'processing' | 'completed' | 'failed'; // Assuming status can be one of these values
-	processedPercentage: number; // Assuming this is a number from 0 to 100
+	percentage: number; // Assuming this is a number from 0 to 100
 };
 
 export type EventList = Event[];

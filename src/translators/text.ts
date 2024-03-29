@@ -92,10 +92,10 @@ export const jsonTextTranslator = async (documents: string[], destLang: string, 
 		const content = await translate(model, document, destLang, fileFormat);
 		index++;
 		progress?.((index / documents.length) * 100);
-		console.log("=====================================")
-		console.log(document)
-		console.log(content)
-		console.log("=====================================")
+		// console.log("=====================================")
+		// console.log(document)
+		// console.log(content)
+		// console.log("=====================================")
 		texts.push(JSON.parse(content));
 	}
 	return texts;

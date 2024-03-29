@@ -5,6 +5,7 @@ import TextInput from 'ink-text-input';
 import { Text, Box, useInput } from 'ink';
 import { EventList } from "./type.js";
 import Table from "./table.js";
+import {useApp} from 'ink';
 
 const Translate = () => {
 	const [step, setStep] = useState<'source' | 'destination' | 'language' | 'processing' | 'done'>('source');
@@ -12,6 +13,7 @@ const Translate = () => {
 	const [destination, setDestination] = useState<string>('');
 	const [language, setLanguage] = useState<string>('');
 	const [events, setEvents] = useState<EventList>([]);
+	const {exit} = useApp();
 
 	const updateEvents = (newEvents: EventList) => {
 		setEvents(newEvents);
@@ -20,8 +22,8 @@ const Translate = () => {
 	const runTranslation = useCallback(async () => {
 		console.log(`Source: ${source}, Destination: ${destination}, Language: ${language}`);
 		await processor(source, destination, language, updateEvents);
-		console.log(`Processing Completed`);
 		setStep('done');
+		exit();
 	}, [source, destination, language]);
 
 	useEffect(() => {
@@ -84,9 +86,9 @@ const Translate = () => {
 				</Box>
 			);
 		case 'processing':
-			return <Table data={events} />;
+			return <Table data={events} columns={['name', 'status', 'percentage']} />;
 		case 'done':
-			return <Table data={events} />;
+			return <Table data={events} columns={['name', 'status', 'percentage']} />;
 		default:
 			return null;
 	}
