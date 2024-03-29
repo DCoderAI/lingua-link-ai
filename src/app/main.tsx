@@ -75,6 +75,14 @@ const App = () => {
 				<Gradient name="instagram">
 					<BigText text="Lingua Link AI"/>
 				</Gradient>
+				<Box width="100%" flexDirection="column">
+					<Text bold={true}>Disclaimer:</Text>
+					<Text>The translations are powered by AI and, while highly effective, may not always achieve perfection.</Text>
+					<Text>Depending on context, some nuances, idioms, or cultural expressions might not be fully captured.</Text>
+				</Box>
+				<Box width="100%" flexDirection="column">
+					<Text>Note: It only supports json, csv, tsv, md and mdx file format.</Text>
+				</Box>
 			</Box>
 			<Box>{
 				currentStep === 'config' ? <ConfigStep onComplete={() => {

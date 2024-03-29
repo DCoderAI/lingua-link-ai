@@ -57,3 +57,7 @@ Feedback and contributions are highly appreciated. If you have ideas for new fea
 For support, feature requests, or bug reports, please file an issue on our GitHub repository. Our team is committed to providing timely and helpful responses.
 
 Thank you for choosing LinguaLinkAI for your translation needs. We're excited to be a part of your multilingual projects!
+
+## Disclaimer
+The translations are powered by AI and, while highly effective, may not always achieve perfection.
+Depending on context, some nuances, idioms, or cultural expressions might not be fully captured.

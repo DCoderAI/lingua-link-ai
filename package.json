@@ -4,7 +4,7 @@
   "main": "index.js",
   "bin": "dist/cli.js",
   "type": "module",
-  "repository": "git@github.com:DCoderAI/i18n-ai-translator.git",
+  "repository": "git@github.com:DCoderAI/lingua-link-ai.git",
   "author": "Durgaprasad-Budhwani <durgaprasad.budhwani@gmail.com>",
   "license": "MIT",
   "scripts": {
