@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text } from 'ink';
+import { Text, Box } from 'ink';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +9,8 @@ import Ollama from "./ollama.js";
 import Bedrock from "./bedrock.js";
 import { Config } from "./type.js";
 import Translate from "./translate.js";
+import Gradient from 'ink-gradient';
+import BigText from 'ink-big-text';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -64,9 +66,20 @@ const App = () => {
 
 	// Determine which step to render based on command-line arguments or stored config
 
-	return currentStep === 'config' ? <ConfigStep onComplete={() => {
-		setCurrentStep('translate');
-	}}/> : <Translate/>;
+	return (
+		<Box width="100%" flexDirection="column">
+			<Box flexDirection="column" paddingBottom={2}>
+				<Gradient name="instagram">
+					<BigText text="Lingua Link AI"/>
+				</Gradient>
+			</Box>
+			<Box>{
+				currentStep === 'config' ? <ConfigStep onComplete={() => {
+					setCurrentStep('translate');
+				}}/> : <Translate />
+			}</Box>
+		</Box>
+	)
 };
 
 export default App;

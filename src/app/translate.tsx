@@ -43,7 +43,7 @@ const Translate = () => {
 		case 'source':
 			return (
 				<Box>
-					<Box>
+					<Box marginRight={2}>
 						<Text>Enter source folder or file:</Text>
 					</Box>
 					<TextInput
@@ -55,15 +55,20 @@ const Translate = () => {
 			);
 		case 'destination':
 			return (
-				<Box>
-					<Box marginRight={1}>
-						<Text>Enter destination folder or file:</Text>
+				<Box  width="100%" flexDirection="column">
+					<Box marginRight={2}>
+						<Text>Enter source folder or file: {source}</Text>
 					</Box>
-					<TextInput
-						value={destination}
-						onChange={setDestination}
-						onSubmit={() => setStep('language')}
-					/>
+					<Box>
+						<Box marginRight={2}>
+							<Text>Enter destination folder or file:</Text>
+						</Box>
+						<TextInput
+							value={destination}
+							onChange={setDestination}
+							onSubmit={() => setStep('language')}
+						/>
+					</Box>
 				</Box>
 			);
 		case 'language':
