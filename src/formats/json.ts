@@ -1,13 +1,8 @@
-import { recombineJsonChunks, splitJsonObject } from "../splitters/json.js";
-import { jsonTextTranslator } from "../translators/text.js";
+import { recombineJsonChunks } from "../splitters/json.js";
+import jsonTranslator from "../translators/json.js";
 
 export const translateJsonFile = async (fileContent: string, destlang: string, progress?: (percentage: number) => void) => {
 	const jsonData = JSON.parse(fileContent);
-	const chunks = splitJsonObject(jsonData, 350);
-	const documents: string[] = [];
-	chunks.forEach((chunk) => {
-		documents.push(JSON.stringify(chunk));
-	});
-	const responseChunks = await jsonTextTranslator(documents, destlang, "json", progress);
+	const responseChunks = await jsonTranslator(jsonData, destlang,  progress);
 	return JSON.stringify(recombineJsonChunks(responseChunks))
 };
