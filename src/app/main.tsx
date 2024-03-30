@@ -41,9 +41,15 @@ const ConfigStep = ({onComplete}: ConfigStepProps) => {
 	return <Text>Configuration complete.</Text>;
 };
 
+type Props = {
+	config?: boolean;
+	source?: string;
+	destination?: string;
+	language?: string;
+}
 
-const App = () => {
-	const [currentStep, setCurrentStep] = useState<'loading' | 'config' | 'translate'>('config');
+const App = ({config, source, destination, language}: Props) => {
+	const [currentStep, setCurrentStep] = useState<'loading' | 'config' | 'translate'>(config ? 'config' : 'loading');
 	const getConfig = useCallback(async () => {
 		const configPath = path.join(__dirname, "..", 'config.json');
 		if (fs.existsSync(configPath)) {
@@ -60,7 +66,9 @@ const App = () => {
 	}, []);
 
 	useEffect(() => {
-		getConfig();
+		if (currentStep === 'loading') {
+			getConfig();
+		}
 	}, []);
 
 	if (currentStep === 'loading') {
@@ -77,7 +85,8 @@ const App = () => {
 				</Gradient>
 				<Box width="100%" flexDirection="column">
 					<Text bold={true}>Disclaimer:</Text>
-					<Text>The translations are powered by AI and, while highly effective, may not always achieve perfection.</Text>
+					<Text>The translations are powered by AI and, while highly effective, may not always achieve
+						perfection.</Text>
 					<Text>Depending on context, some nuances, idioms, or cultural expressions might not be fully captured.</Text>
 				</Box>
 				<Box width="100%" flexDirection="column">
@@ -87,7 +96,7 @@ const App = () => {
 			<Box>{
 				currentStep === 'config' ? <ConfigStep onComplete={() => {
 					setCurrentStep('translate');
-				}}/> : <Translate />
+				}}/> : <Translate source={source} language={language} destination={destination}/>
 			}</Box>
 		</Box>
 	)
