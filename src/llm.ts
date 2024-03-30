@@ -11,15 +11,24 @@ const __dirname = dirname(__filename);
 const configPath = path.join(__dirname, 'config.json');
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI } from "@langchain/openai";
+import { parentChildSeparator } from "./splitters/json.js";
 
 const JSON_TEMPLATE = `
-- For the json file format, the translated text do not change the keys and only translate the values. Do not remove $$$$$$$ from the keys.
-- For the json file format, the translated text should also change values of the arrays. But do not change the key and order of the array if there is nested array.
-- For the json file format, the translated text every key is very important, do not miss any key.
-- For the json file format, the translated text should add closing curly brackets to nested object if it is missed. This has been missed multiple times.
-- For the json file format, the translated text do not change the case of the keys. Keep the keys in the same case as they are in the text input.
-- For the json file format, the translated content is directly sent to JSON.parse() function. Make sure to return only valid JSON data or it will failed to parse.
-- For the json file format, don't use "，", use comma "," instead.
+- You should do not change the keys and only translate the values.
+- You should not change JSON object structure and only translate the values.
+- You should not change the JSON structure.
+- You should not combine similar set of keys into one.
+- You should not remove ${parentChildSeparator} from the string or from the JSON object keys.
+- You should also change values of the arrays. You should not change the key and order of the array if there is nested array.
+- The translated text every key is very important, do not miss any key.
+- The translated text should add closing curly brackets to nested object if it is missed. This has been missed multiple times.
+- The translated text do not change the case of the keys. Keep the keys in the same case as they are in the text input.
+- Make sure the translated text is valid JSON. If it is not valid JSON, it will fail to parse.
+- The translated content is directly sent to JSON.parse() function. Make sure to return only valid JSON data or it will failed to parse.
+- The JSON data is coming in chunks. The relationship between the chunks is maintained by the ${parentChildSeparator} in the keys.
+- If you see any string with ${parentChildSeparator} then this is nested key. This entire key should not be altered or deleted. Only the value should be translated. The nested key is useful to get the JSON data back.
+- Don't use "，", use comma "," instead.
+- Return the response into \`\`\`{fileFormat} \nresponse\n\`\`\`. Don't forget to add {fileFormat} marker between the {fileFormat} response.
 `
 
 const MDX_TEMPLATE = `
@@ -36,8 +45,7 @@ const getTranslateTemplate = (fileFormat: string) => {
 		additionalInstruction = MDX_TEMPLATE;
 	}
 	return `
-Instructions for Translation:
-- Translate the following sentence to {destLang}
+- You are expert in language translations. Translate the following sentence to {destLang}
 - Keep the file format {fileFormat} same.
 - The translated text will be directly written to the file.
 - The translated text should not worry about the perfect translation.
@@ -57,42 +65,34 @@ Original Text Content:
 `;
 }
 
-function extractAndCorrectJsonFromText(text: string) {
-	const lines = text.split('\n');
-	let correctedJson = null;
+function extractAndParseJSONFromText(text: string) {
+	// Define start and end markers for the JSON content
+	const startMarker = '```json';
+	const endMarker = '```';
 
-	for (const line of lines) {
-		// Simplistic check to find a line that looks like it starts with JSON
-		if (line.trim().startsWith('{')) {
-			// Attempt to correct and parse the JSON
-			try {
-				correctedJson = correctJsonStructure(line);
-				// Attempt to parse to check validity
-				return JSON.parse(correctedJson);
-			} catch (error) {
-				console.error("Found JSON-like line, but couldn't correct or parse it:", line);
-				// Optionally, handle the error or attempt further corrections
-			}
-		}
+	// Attempt to find the start and end of the JSON content based on the markers
+	let startIndex = text.indexOf(startMarker);
+	let endIndex = text.indexOf(endMarker, startIndex + startMarker.length);
+
+	let jsonString;
+
+	if (startIndex !== -1 && endIndex !== -1) {
+		// Adjust startIndex to skip the marker itself
+		startIndex += startMarker.length;
+		// Extract the JSON string within markers
+		jsonString = text.substring(startIndex, endIndex).trim();
+	} else {
+		// If markers not found, consider the entire text as potential JSON data
+		jsonString = text.trim();
 	}
 
-	return correctedJson;
-}
-
-function correctJsonStructure(jsonString: string) {
-	let balance = 0;
-	let correctedString = '';
-
-	for (const char of jsonString) {
-		correctedString += char;
-		if (char === '{') balance++;
-		if (char === '}') balance--;
+	// Attempt to parse the JSON string
+	try {
+		const jsonData = JSON.parse(jsonString);
+		return jsonData;
+	} catch (error: any) {
+		throw new Error(`Failed to parse JSON: ${error?.message || error?.toString()}`);
 	}
-
-	// If there are more opening braces, add the necessary closing braces
-	if (balance > 0) correctedString += '}'.repeat(balance);
-
-	return correctedString;
 }
 
 
@@ -112,15 +112,18 @@ export const translate = async (text: string, destLang: string, fileFormat: stri
 
 	switch (configuration.llm) {
 		case "ollama":
+			console.log(response)
 			let ollamaContent = response;
-			if (fileFormat === "json") {
-				return JSON.stringify(extractAndCorrectJsonFromText(ollamaContent), null, 2);
-			}
 			const regex1 = /Here is the translation \w.+/gi; // remove the full like
 			const regex2 = /Note: \w.+/gi; // remove the full like
 			const regex3 = /Sure, \w.+/gi; // remove the full like
 			const regex4 = /^.*Translation: \w.+/;
-			return ollamaContent.replace(regex1, "").replace(regex2, "").replace(regex3, "").replace(regex4, "");
+			if (fileFormat === "json") {
+				ollamaContent = ollamaContent.replace(regex1, "").replace(regex2, "").replace(regex3, "").replace(regex4, "");
+				console.log("LLM Response: ", extractAndParseJSONFromText(ollamaContent))
+				return JSON.stringify(extractAndParseJSONFromText(ollamaContent), null, 2);
+			}
+			return ollamaContent;
 		case "bedrock":
 			const content = response?.content;
 			if (fileFormat === "json") {
@@ -150,9 +153,10 @@ const getLLMModel = () => {
 			// @ts-ignore
 			const newConfig = configuration.config as Ollama;
 			return new Ollama({
-				temperature: 0.1,
-				model: 'llama2', //newConfig.model,
+				// temperature: 0.1,
+				model: 'mistral', //newConfig.model,
 			});
+
 		}
 		if (configuration.llm === "bedrock") {
 			const newConfig = configuration.config as BedrockModelAwsKey;

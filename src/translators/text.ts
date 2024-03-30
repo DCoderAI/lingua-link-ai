@@ -35,9 +35,9 @@ export const jsonTextTranslator = async (documents: string[], destLang: string, 
 		while (attempts < maxAttempts) {
 			try {
 				content = await translate(document, destLang, fileFormat);
-				// console.log("=====================================")
-				// console.log(document)
-				// console.log(content)
+				console.log("=====================================")
+				console.log(document)
+				console.log(content)
 
 				// Try parsing the content right after fetching it
 				try {
@@ -46,8 +46,8 @@ export const jsonTextTranslator = async (documents: string[], destLang: string, 
 					// if (parsedContent === null) {
 					// 	throw new Error("No valid JSON object found in the translation");
 					// }
-					// console.log(parsedContent)
-					// console.log("=====================================")
+					console.log(parsedContent)
+					console.log("=====================================")
 					texts.push(parsedContent);
 					break; // Exit the loop if translation and parsing are successful
 				} catch (parseError) {

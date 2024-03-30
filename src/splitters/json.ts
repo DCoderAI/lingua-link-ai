@@ -1,6 +1,6 @@
 export const estimateSize = (jsonObject: any): number => new Blob([JSON.stringify(jsonObject)]).size;
 
-const parentChildSeparator = '$$$$$$';
+export const parentChildSeparator = '$DoNotRemoveOrChange$';
 
 export const splitJsonObject = (jsonObject: any, maxSize: number, parentKey: string = ''): any[] => {
 	const chunks: any[] = [];
@@ -51,7 +51,7 @@ export const recombineJsonChunks = (chunks: any[]): any => {
 
 	chunks.forEach(chunk => {
 		Object.entries(chunk).forEach(([fullKey, value]) => {
-			let pathParts = fullKey.split(/\$\$\$\$\$\$|\[|\]/).filter(p => p !== ''); // Modified split
+			let pathParts = fullKey.split(/\$DoNotRemoveOrChange\$|\[|\]/).filter(p => p !== ''); // Modified split
 			let currentPart: any = recombinedJson;
 
 			pathParts.forEach((part, index) => {
